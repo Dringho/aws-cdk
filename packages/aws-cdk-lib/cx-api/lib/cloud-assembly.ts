@@ -8,6 +8,8 @@ import { CloudArtifact } from './cloud-artifact';
 import { topologicalSort } from './toposort';
 import * as cxschema from '../../cloud-assembly-schema';
 
+const CLOUD_ASSEMBLY_SYMBOL = Symbol.for('@aws-cdk/cx-api.CloudAssembly');
+
 /**
  * The name of the root manifest file of the assembly.
  */
@@ -17,6 +19,15 @@ const MANIFEST_FILE = 'manifest.json';
  * Represents a deployable cloud application.
  */
 export class CloudAssembly {
+  /**
+   * Return whether the given object is a Stack.
+   *
+   * We do attribute detection since we can't reliably use 'instanceof'.
+   */
+  public static isCloudAssembly(x: any): x is CloudAssembly {
+    return x !== null && typeof(x) === 'object' && CLOUD_ASSEMBLY_SYMBOL in x;
+  }
+
   /**
    * The root directory of the cloud assembly.
    */
@@ -53,6 +64,8 @@ export class CloudAssembly {
     this.version = this.manifest.version;
     this.artifacts = this.renderArtifacts(loadOptions?.topoSort ?? true);
     this.runtime = this.manifest.runtime || { libraries: { } };
+
+    Object.defineProperty(this, CLOUD_ASSEMBLY_SYMBOL, { value: true });
 
     // force validation of deps by accessing 'depends' on all artifacts
     this.validateDeps();

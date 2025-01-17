@@ -1,5 +1,3 @@
-import type * as cxapi from '@aws-cdk/cx-api';
-
 export interface AppProps {
   /**
    * The output directory into which to the builder app will emit synthesized artifacts.
@@ -12,7 +10,14 @@ export interface AppProps {
   readonly context?: { [key: string]: any };
 }
 
-export type AssemblyBuilder = (props: AppProps) => Promise<cxapi.CloudAssembly>;
+export type AssemblyBuilder = (props: AppProps) => Promise<ICloudAssembly>;
+
+export interface ICloudAssembly {
+  /**
+   * The root directory of the cloud assembly.
+   */
+  readonly directory: string;
+}
 
 /**
  * Configuration for creating a CLI from an AWS CDK App directory
